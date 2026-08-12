@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#111111">
+
+  <title>BoMexochat</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f5f5f7;
+      color: #111;
+    }
+
+    .app {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header {
+      height: 64px;
+      background: white;
+      border-bottom: 1px solid #ddd;
+      display: flex;
+      align-items: center;
+      padding: 0 18px;
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .header span {
+      margin-left: 10px;
+    }
+
+    .messages {
+      flex: 1;
+      padding: 20px 15px;
+      overflow-y: auto;
+    }
+
+    .empty {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #888;
+      text-align: center;
+      font-size: 16px;
+    }
+
+    .message {
+      max-width: 78%;
+      margin-bottom: 12px;
+      padding: 10px 14px;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.08);
+    }
+
+    .message.mine {
+      margin-left: auto;
+      background: #111;
+      color: white;
+    }
+
+    .sender {
+      font-size: 12px;
+      font-weight: 600;
+      opacity: .6;
+      margin-bottom: 4px;
+    }
+
+    .input-area {
+      background: white;
+      border-top: 1px solid #ddd;
+      padding: 10px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .input-area input {
+      flex: 1;
+      border: 1px solid #ddd;
+      border-radius: 22px;
+      padding: 12px 16px;
+      font-size: 16px;
+      outline: none;
+    }
+
+    .send {
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 50%;
+      background: #111;
+      color: white;
+      font-size: 20px;
+    }
+
+    .login {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 25px;
+    }
+
+    .login-box {
+      width: 100%;
+      max-width: 400px;
+      background: white;
+      border-radius: 24px;
+      padding: 30px;
+      box-shadow: 0 10px 40px rgba(0,0,0,.08);
+    }
+
+    .logo {
+      font-size: 32px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      color: #777;
+      margin-bottom: 25px;
+    }
+
+    .login-box input {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      font-size: 16px;
+    }
+
+    .login-button {
+      width: 100%;
+      padding: 14px;
+      border: 0;
+      border-radius: 12px;
+      background: #111;
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ЭКРАН ВХОДА -->
+  <div id="loginScreen" class="login">
+    <div class="login-box">
+
+      <div class="logo">BoMexochat</div>
+
+      <div class="subtitle">
+        Закрытый чат для своих
+      </div>
+
+      <input
+        id="email"
+        type="email"
+        placeholder="Email"
+        autocomplete="email"
+      >
+
+      <input
+        id="password"
+        type="password"
+        placeholder="Пароль"
+        autocomplete="current-password"
+      >
+
+      <button class="login-button" onclick="login()">
+        Войти
+      </button>
+
+    </div>
+  </div>
+
+
+  <!-- ЧАТ -->
+  <div id="chatScreen" class="app hidden">
+
+    <div class="header">
+      💬
+      <span>Общий чат</span>
+    </div>
+
+    <div id="messages" class="messages">
+
+      <div class="empty">
+        Пока сообщений нет.<br>
+        Напиши первое сообщение 👋
+      </div>
+
+    </div>
+
+    <div class="input-area">
+
+      <input
+        id="messageInput"
+        type="text"
+        placeholder="Сообщение..."
+        onkeydown="handleEnter(event)"
+      >
+
+      <button class="send" onclick="sendMessage()">
+        ↑
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <script>
+
+    function login() {
+
+      const email =
+        document.getElementById("email").value;
+
+      const password =
+        document.getElementById("password").value;
+
+      if (!email || !password) {
+        alert("Введите email и пароль");
+        return;
+      }
+
+      /*
+        Пока это демонстрационный вход.
+        На следующем этапе подключим
+        настоящий Supabase Auth.
+      */
+
+      document
+        .getElementById("loginScreen")
+        .classList.add("hidden");
+
+      document
+        .getElementById("chatScreen")
+        .classList.remove("hidden");
+    }
+
+
+    function handleEnter(event) {
+
+      if (event.key === "Enter") {
+        sendMessage();
+      }
+
+    }
+
+
+    function sendMessage() {
+
+      const input =
+        document.getElementById("messageInput");
+
+      const text =
+        input.value.trim();
+
+      if (!text) return;
+
+      const messages =
+        document.getElementById("messages");
+
+      const empty =
+        messages.querySelector(".empty");
+
+      if (empty) {
+        empty.remove();
+      }
+
+      const message =
+        document.createElement("div");
+
+      message.className = "message mine";
+
+      message.textContent = text;
+
+      messages.appendChild(message);
+
+      input.value = "";
+
+      messages.scrollTop =
+        messages.scrollHeight;
+    }
+
+  </script>
+
+</body>
+</html>
